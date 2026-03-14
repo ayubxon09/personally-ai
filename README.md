@@ -1,7 +1,6 @@
 # 🤖 Shaxsiy AI Assistant
 
-Sizning to'liq shaxsiy AI assistantingiz — Claude AI asosida qurilgan.
-
+Sizning to'liq shaxsiy AI assistantingiz
 ---
 
 ## ✨ Imkoniyatlar
