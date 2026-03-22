@@ -2,9 +2,13 @@
 import { useStore } from '@/lib/store'
 import { MODES } from '@/lib/modes'
 import { ChatMode, Conversation } from '@/types'
-import { Trash2, Plus, MessageSquare, ChevronLeft } from 'lucide-react'
+import { Trash2, Plus, ChevronLeft, X } from 'lucide-react'
 
-export default function Sidebar() {
+interface Props {
+  onMobileClose?: () => void
+}
+
+export default function Sidebar({ onMobileClose }: Props) {
   const {
     conversations, activeId, mode,
     createConversation, setActive, deleteConversation,
@@ -13,21 +17,37 @@ export default function Sidebar() {
 
   const handleNew = (m?: ChatMode) => {
     createConversation(m)
+    onMobileClose?.()
   }
 
-  if (!sidebarOpen) return null
-
   return (
-    <aside className="w-64 flex-shrink-0 bg-dark-950 border-r border-dark-700 flex flex-col h-full">
+    <aside className="w-64 sm:w-64 flex-shrink-0 bg-dark-950 border-r border-dark-700 flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-dark-700 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-green-ai flex items-center justify-center text-xs font-bold text-white">AI</div>
+          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-accent to-green-ai flex items-center justify-center text-xs font-bold text-white">
+            AI
+          </div>
           <span className="font-semibold text-sm text-dark-50">Shaxsiy AI</span>
         </div>
-        <button onClick={toggleSidebar} className="text-dark-400 hover:text-dark-200 transition-colors p-1 rounded">
-          <ChevronLeft size={16} />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Mobile close */}
+          {onMobileClose && (
+            <button
+              onClick={onMobileClose}
+              className="sm:hidden text-dark-400 hover:text-dark-200 transition-colors p-1 rounded"
+            >
+              <X size={16} />
+            </button>
+          )}
+          {/* Desktop collapse */}
+          <button
+            onClick={toggleSidebar}
+            className="hidden sm:block text-dark-400 hover:text-dark-200 transition-colors p-1 rounded"
+          >
+            <ChevronLeft size={16} />
+          </button>
+        </div>
       </div>
 
       {/* Modes */}
@@ -38,11 +58,10 @@ export default function Sidebar() {
             <button
               key={m.id}
               onClick={() => { setMode(m.id); handleNew(m.id) }}
-              className={`flex flex-col items-center gap-0.5 p-2 rounded-lg text-xs transition-all ${
-                mode === m.id
+              className={`flex flex-col items-center gap-0.5 p-2 rounded-lg text-xs transition-all ${mode === m.id
                   ? 'bg-accent/20 text-accent-light border border-accent/30'
                   : 'text-dark-300 hover:bg-dark-700 hover:text-dark-100'
-              }`}
+                }`}
               title={m.description}
             >
               <span className="text-base leading-none">{m.icon}</span>
@@ -52,7 +71,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* New Chat Button */}
+      {/* New Chat */}
       <div className="p-3">
         <button
           onClick={() => handleNew()}
@@ -67,7 +86,7 @@ export default function Sidebar() {
       <div className="flex-1 overflow-y-auto px-2 pb-4">
         {conversations.length === 0 ? (
           <div className="text-center text-dark-500 text-xs py-8 px-4">
-            Hali suhbat yo'q.<br />Yuqoridagi tugmani bosing.
+            Hali suhbat yo'q.
           </div>
         ) : (
           <div className="space-y-0.5">
@@ -76,7 +95,7 @@ export default function Sidebar() {
                 key={conv.id}
                 conv={conv}
                 active={conv.id === activeId}
-                onSelect={() => setActive(conv.id)}
+                onSelect={() => { setActive(conv.id); onMobileClose?.() }}
                 onDelete={() => deleteConversation(conv.id)}
               />
             ))}
@@ -84,9 +103,8 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Footer */}
       <div className="p-3 border-t border-dark-700 text-xs text-dark-500 text-center">
-        {process.env.NEXT_PUBLIC_OWNER_NAME || 'Shaxsiy'} AI · Claude
+        Ayubxon AI · Groq
       </div>
     </aside>
   )
@@ -102,9 +120,8 @@ function ConvItem({ conv, active, onSelect, onDelete }: {
 
   return (
     <div
-      className={`group flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-all ${
-        active ? 'bg-dark-700 text-dark-50' : 'text-dark-300 hover:bg-dark-800 hover:text-dark-100'
-      }`}
+      className={`group flex items-center gap-2 px-2 py-2 rounded-lg cursor-pointer transition-all ${active ? 'bg-dark-700 text-dark-50' : 'text-dark-300 hover:bg-dark-800 hover:text-dark-100'
+        }`}
       onClick={onSelect}
     >
       <span className="text-sm flex-shrink-0">{modeIcon}</span>
